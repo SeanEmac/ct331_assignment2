@@ -59,20 +59,19 @@
 ; F
 ; Same as insert list but with < or > function passed in
 (define (higher_order lst order)
-    (cond
-        [ (eq? order <) (insert_list lst) ]; Normal sort acending
-        [ else (insert_list_descending lst)]; Descending sort
+    (cond   [ (eq? order <) (insert_list lst) ]; Normal sort acending
+            [ else (insert_list_descending lst)]; Descending sort
     )
 )
 
 (define (insert_list_descending lst tree); Returns a new tree with the list inserted
     (cond   [ (null? (car lst)) tree ]; If the list is empty return the tree
             [ else ( (insert_item_descending (car lst)); Insert the first item in the list
-                     (insert_list_descending (cdr lst) tree) )]; Recursively inser the rest of the list
+                     (insert_list_descending (cdr lst) tree) ) ]; Recursively inser the rest of the list
     )
 )
 
-(define (insert_item_descending)
+(define (insert_item_descending item tree)
 ; Reversed implementation of insert item, will insert lower items on the right. 
     (cond   [ (null? tree) (create item null null) ]; If null, make a new tree
             [ (eq? (value tree) item) tree ]; If item is already there, dont change anything
