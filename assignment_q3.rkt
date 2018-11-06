@@ -12,6 +12,7 @@
 (define (left-child tree)(cadr tree)); return left branch
 (define (right-child tree)(caddr tree)); return right branch
 
+; A
 (define (sorted_order tree)
     (cond   [ (null? tree) #f ]; Tree is empty
             [ else ((sorted_order(left-child tree)); Call on Left sub-tree first so that its in sorted order
@@ -20,6 +21,7 @@
     )
 )
 
+; B
 (define (is_present item tree)
     (cond   [ (null? tree) #f ]; Tree is empty
             [ (eq? item (value tree)) #t ]; Item Found
@@ -28,6 +30,7 @@
     )
 )
 
+; C
 (define (insert_item item tree); Returns a new tree with the item added
     (cond   [ (null? tree) (create item null null) ]; If null, make a new tree
             [ (eq? (value tree) item) tree ]; If item is already there, dont change anything
@@ -38,6 +41,7 @@
     )
 )
 
+; D
 (define (insert_list lst tree); Returns a new tree with the list inserted
     (cond   [ (null? (car lst)) tree ]; If the list is empty return the tree
             [ else ( (insert_item (car lst)); Insert the first item in the list
@@ -45,15 +49,38 @@
     )
 )
 
+; E
 ; Take a list and make it into a binary search
 (define (tree_sort lst)
     (define tree (insert_list lst '())); Make a tree and insert the list
     (sorted_order tree); Display the tree
 )
 
-; Same as insert list but with < or > passed in
-(define (higher_order lst func)
-    (display "sorted list higher order\n")
+; F
+; Same as insert list but with < or > function passed in
+(define (higher_order lst order)
+    (cond
+        [ (eq? order <) (insert_list lst) ]; Normal sort acending
+        [ else (insert_list_descending lst)]; Descending sort
+    )
+)
+
+(define (insert_list_descending lst tree); Returns a new tree with the list inserted
+    (cond   [ (null? (car lst)) tree ]; If the list is empty return the tree
+            [ else ( (insert_item_descending (car lst)); Insert the first item in the list
+                     (insert_list_descending (cdr lst) tree) )]; Recursively inser the rest of the list
+    )
+)
+
+(define (insert_item_descending)
+; Reversed implementation of insert item, will insert lower items on the right. 
+    (cond   [ (null? tree) (create item null null) ]; If null, make a new tree
+            [ (eq? (value tree) item) tree ]; If item is already there, dont change anything
+            [ (> item (value tree)); If item < value insert in the right branch
+                (create (value tree) (insert_item_descending item (left-child tree)) (right-child tree)) ]
+            [ (< item (value tree)); If item > value insert in the left branch
+                (create (value tree) (left-child tree) (insert_item_descending item (right-child tree))) ]
+    )
 )
 
 (define tree1 (create 2 1 3))
