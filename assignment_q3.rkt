@@ -7,17 +7,22 @@
 (provide higher_order)
 
 ; Some helper functions for trees.
-(define (create value left-child right-child)(list value left-child right-child)); Make a tree using list
-(define (value tree)(car tree)); return the value
-(define (left-child tree)(cadr tree)); return left branch
-(define (right-child tree)(caddr tree)); return right branch
+(define (create node left right)(list left node right)); Make a tree using list
+; take tree as a list of Left-Node-Right
+; when creating, the format is Node-Left-Right
+(define (left-child tree)(car tree)); return left branch
+(define (value tree)(cadr tree)); return the value
+(define (right-child tree)(caddr tree)); return right branch; caddr
 
 ; A
 (define (sorted_order tree)
-    (cond   [ (null? tree) #f ]; Tree is empty
-            [ else ((sorted_order(left-child tree)); Call on Left sub-tree first so that its in sorted order
-                    (display (value tree)); Print Current value
-                    (sorted_order(right-child tree))) ]; Call on Right sub-tree
+    (begin  (cond [ (not (null? (left-child tree))) (sorted_order (left-child tree))])
+            ; If left child not null, call recusively on left child
+            (display (value tree))
+            ; Display node value
+            (display " ")
+            (cond [ (not (null? (right-child tree))) (sorted_order (right-child tree))])
+            ; If right child not null, call recursively on right child
     )
 )
 
@@ -43,9 +48,10 @@
 
 ; D
 (define (insert_list lst tree); Returns a new tree with the list inserted
-    (cond   [ (null? (car lst)) tree ]; If the list is empty return the tree
-            [ else ( (insert_item (car lst)); Insert the first item in the list
-                     (insert_list (cdr lst) tree) )]; Recursively inser the rest of the list
+    (cond   [ (null? lst) tree ]; If the list is empty return the tree
+            [ else (insert_list (cdr lst) (insert_item (car lst) tree)) ]
+            ; Else recursivly call insert list on the rest of the list
+            ; while inserting the Car of the list
     )
 )
 
@@ -57,17 +63,17 @@
 )
 
 ; F
-; Same as insert list but with < or > function passed in
+; Same as tree sort but with < or > function passed in
 (define (higher_order lst order)
-    (cond   [ (eq? order <) (insert_list lst) ]; Normal sort acending
-            [ else (insert_list_descending lst)]; Descending sort
+    ; 0 for normal ascending, 1 for descending
+    (cond   [ (eq? order 0) (sorted_order (insert_list lst '() )) ]; Normal sort acending
+            [ (eq? order 1) (sorted_order (insert_list_descending lst '() )) ]; Descending sort
     )
 )
 
-(define (insert_list_descending lst tree); Returns a new tree with the list inserted
-    (cond   [ (null? (car lst)) tree ]; If the list is empty return the tree
-            [ else ( (insert_item_descending (car lst)); Insert the first item in the list
-                     (insert_list_descending (cdr lst) tree) ) ]; Recursively inser the rest of the list
+(define (insert_list_descending lst tree); Same as normal insert list but calls descending verion of insert item
+    (cond   [ (null? lst) tree ];
+            [ else (insert_list_descending (cdr lst) (insert_item_descending (car lst) tree)) ]
     )
 )
 
@@ -75,19 +81,62 @@
 ; Reversed implementation of insert item, will insert lower items on the right. 
     (cond   [ (null? tree) (create item null null) ]; If null, make a new tree
             [ (eq? (value tree) item) tree ]; If item is already there, dont change anything
-            [ (> item (value tree)); If item < value insert in the right branch
+            [ (> item (value tree)); if item > value, insert on left (opposite of normal)
                 (create (value tree) (insert_item_descending item (left-child tree)) (right-child tree)) ]
-            [ (< item (value tree)); If item > value insert in the left branch
+            [ (< item (value tree)); if item < value, insert on right (opposite of normal)
                 (create (value tree) (left-child tree) (insert_item_descending item (right-child tree))) ]
     )
 )
 
-(define tree1 (create 2 1 3))
-(define tree2 (create 6 5 7))
-(define tree3 (create 4 tree1 tree2))
+; Create a tree for testing
+(define one (create 1 null null))
+(define three (create 3 null null))
+(define five (create 5 null null))
+(define seven (create 7 null null))
+(define tree1 (create 2 one three))
+(define tree2 (create 6 five seven))
+(define MainTree (create 4 tree1 tree2))
 
-;        4
-;     /     \
-;    2       6
-;   / \     / \ 
-;  1   3   5   7
+;         4
+;      /     \
+;     2       6
+;    / \     / \ 
+;   1   3   5   7
+;  / \ / \ / \ / \
+;()() ()() ()() ()() Row of nulls
+
+(sorted_order MainTree); Display tree
+(display "\nIs 8 present? ")
+(is_present 8 MainTree)
+
+(display "\nInserting 8:\n"); Insert item into the tree
+(define ChangedTree (insert_item 8 MainTree))
+(sorted_order ChangedTree)
+(display "\nIs 8 present? ")
+(is_present 8 ChangedTree)
+
+
+(define lst (list 8 9 10)); Insert list into the tree
+(display "\nInserting a list: ")
+(display lst)
+(display "\ninto: ")
+(sorted_order MainTree)
+(display "\n")
+(sorted_order (insert_list lst MainTree))
+
+(define lst1 (list 5 2 9 3)); sort a list
+(display "\n\nTree sorting : ")
+(display lst1)
+(display "\n")
+(tree_sort lst1)
+
+(define lst2 (list 1 2 3 4 5)); Higher order sort a list
+(display "\n\nHigher Order Sorting Ascending : ")
+(display lst2)
+(display "\n")
+(higher_order lst2 0)
+(display "\n\nHigher Order Sorting Descending : ")
+(display lst2)
+(display "\n")
+(higher_order lst2 1)
+(display "\n\n")

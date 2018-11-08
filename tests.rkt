@@ -26,10 +26,10 @@
 
 ;Begin test functions
 (define (test_ins_beg1)
-  (eq? (ins_beg 1 '(2 3 4)) '(1 2 3 4)))
+  (equal? (ins_beg 1 '(2 3 4)) '(1 2 3 4)))
 
 (define (test_ins_end1)
-  (eq? (ins_end 'a '(b c d)) '(1 2 3 4)))
+  (equal? (ins_end d '(a b c)) '(a b c d)))
   
 (define (test_count_tl)
   (eq? (count_top_level '(a b c d (e f))) 5))
